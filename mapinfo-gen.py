@@ -4,6 +4,7 @@ from ttk import *
 import tkMessageBox
 import tkFileDialog
 import omg
+import json
 
 class MapInfo():
     def __init__(self,mapid,blank=False):
@@ -94,6 +95,19 @@ class MapInfo():
             output += 'secretnext = "MAP31"\n'
         output += '\n'
         return output
+        
+    def to_JMAPINFO(self):
+        dat = {
+            'map': self.mapid,
+            'title': self.title,
+            'author': self.author,
+            'music': self.music,
+            'sky': self.sky,
+            'titlepatch': self.titlepatch,
+            'nextmap': self.nextmap,
+            'par': str(self.partime)
+        }
+        return dat
         
 def mapxx_gen(id):
     if id < 10:
@@ -299,6 +313,7 @@ class MapInfoList():
         output.data["EMAPINFO"] = omg.Lump(self.to_EMAPINFO())
         output.data["MAPINFO"] = omg.Lump(self.to_MAPINFO())
         output.data["DEHACKED"] = omg.Lump(self.to_DEHACKED())
+        output.data["JMAPINFO"] = omg.Lump(self.to_JMAPINFO())
         return output
         
     def save_map(self,mapid,data):
@@ -327,6 +342,12 @@ class MapInfoList():
         for m in self.maps:
             output += m.to_EMAPINFO()
         return output
+        
+    def to_JMAPINFO(self):
+        output = []
+        for m in self.maps:
+            output.append(m.to_JMAPINFO())
+        return json.dumps(output,separators=(',', ': '),indent=2)
     
     def to_DEHACKED(self):
         output = ''
