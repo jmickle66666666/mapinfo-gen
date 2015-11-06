@@ -76,6 +76,25 @@ class MapInfo():
         output += 'PAR {} {}\n'.format(mapxx_decode(self.mapid),self.partime)
         return output
         
+    def to_MAPINFO(self):
+        output = ''
+        output += 'map {} "{}" //{}\n'.format(self.mapid,self.title,self.author)
+        if self.titlepatch != '': output += 'titlepatch {}\n'.format(self.titlepatch)
+        if self.nextmap != '': output += 'next {}\n'.format(self.nextmap)
+        if self.sky != '': output += 'sky1 {} 0\n'.format(self.sky)
+        output += 'par {}\n'.format(self.partime)
+        if self.music != '': output += 'music {}\n'.format(self.music)
+        if self.mapid == "MAP07":
+            output += 'map07special\n'
+        if self.mapid == "E1M8":
+            output += 'baronspecial\n'
+        if self.mapid == "MAP15":
+            output += 'secretnext = "MAP30"\n'
+        if self.mapid == "MAP30":
+            output += 'secretnext = "MAP31"\n'
+        output += '\n'
+        return output
+        
 def mapxx_gen(id):
     if id < 10:
         xx = "0"+str(id)
@@ -278,6 +297,7 @@ class MapInfoList():
         output = omg.WAD()
         output.data["ZMAPINFO"] = omg.Lump(self.to_ZMAPINFO())
         output.data["EMAPINFO"] = omg.Lump(self.to_EMAPINFO())
+        output.data["MAPINFO"] = omg.Lump(self.to_MAPINFO())
         output.data["DEHACKED"] = omg.Lump(self.to_DEHACKED())
         return output
         
@@ -294,6 +314,12 @@ class MapInfoList():
         output = ''
         for m in self.maps:
             output += m.to_ZMAPINFO()
+        return output
+        
+    def to_MAPINFO(self):
+        output = ''
+        for m in self.maps:
+            output += m.to_MAPINFO()
         return output
     
     def to_EMAPINFO(self):
