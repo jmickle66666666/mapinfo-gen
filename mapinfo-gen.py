@@ -148,8 +148,16 @@ class MapInfoEditor(Frame):
         self.label_partime = Label(self, text="Par time")
         self.label_partime.grid(row=7,column=0,sticky=E)
         
-        self.button_save = Button(self, text="Save", command=self.save)
+        self.button_save = Button(self, text="Add", command=self.full_save)
         self.button_save.grid(row=8,column=0, columnspan=2)
+        
+    def full_save(self):
+        self.save()
+        
+        self.main.save_map(self.mapinfo.mapid,self.mapinfo)
+        tkMessageBox.showinfo("done","map saved")
+        self.main.build_maplist()
+        
         
     def save(self):
     
@@ -161,10 +169,6 @@ class MapInfoEditor(Frame):
         self.mapinfo.titlepatch = self.text_titlepatch.get()
         self.mapinfo.nextmap = self.text_nextmap.get()
         self.mapinfo.partime = int(self.text_partime.get())
-        
-        self.main.save_map(self.mapinfo.mapid,self.mapinfo)
-        tkMessageBox.showinfo("done","map saved")
-        self.main.build_maplist()
         
         
 class MainWindow(Tk):
@@ -207,6 +211,7 @@ class MainWindow(Tk):
         
     def build_mapinfoeditor(self,data=None):
         if self.editor is not None:
+            self.editor.save()
             self.editor.destroy()
         
         if data is None:
