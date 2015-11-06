@@ -10,12 +10,12 @@ class MapInfo():
         self.mapid = mapid
         
         if blank is True:
-            self.title = " "
-            self.author = " "
-            self.music = " "
-            self.sky = " "
-            self.titlepatch = " "
-            self.nextmap = " "
+            self.title = ""
+            self.author = ""
+            self.music = ""
+            self.sky = ""
+            self.titlepatch = ""
+            self.nextmap = ""
         else:
             self.title = "Rad Map"
             self.author = "Cool Mapper"
@@ -34,11 +34,11 @@ class MapInfo():
         output = ''
         output += 'map {id} "{title}" //{author}\n'.format(id=self.mapid, title=self.title, author=self.author)
         output += '{\n'
-        output += 'titlepatch = "{}"\n'.format(self.titlepatch)
-        output += 'sky1 = "{}"\n'.format(self.sky)
+        if self.titlepatch != '': output += 'titlepatch = "{}"\n'.format(self.titlepatch)
+        if self.sky != '': output += 'sky1 = "{}"\n'.format(self.sky)
         output += 'par = {}\n'.format(self.partime)
-        output += 'music = "{}"\n'.format(self.music)
-        output += 'next = "{}"\n'.format(self.nextmap)
+        if self.music != '': output += 'music = "{}"\n'.format(self.music)
+        if self.nextmap != '': output += 'next = "{}"\n'.format(self.nextmap)
         if self.mapid == "MAP07":
             output += 'map07special\n'
         if self.mapid == "E1M8":
@@ -54,11 +54,11 @@ class MapInfo():
         output = ''
         output += '[{}]\n'.format(self.mapid)
         output += 'levelname = {}\n'.format(self.title)
-        output += 'creator = {}\n'.format(self.author)
-        output += 'skyname = {}\n'.format(self.sky)
-        output += 'levelpic = {}\n'.format(self.titlepatch)
-        output += 'music = {}\n'.format(self.music)
-        output += 'nextlevel = {}\n'.format(self.nextmap)
+        if self.author != '': output += 'creator = {}\n'.format(self.author)
+        if self.sky != '': output += 'skyname = {}\n'.format(self.sky)
+        if self.titlepatch != '': output += 'levelpic = {}\n'.format(self.titlepatch)
+        if self.music != '': output += 'music = {}\n'.format(self.music)
+        if self.nextmap != '': output += 'nextlevel = {}\n'.format(self.nextmap)
         if self.mapid == "MAP15":
             output += 'nextsecret = MAP30\n'
         if self.mapid == "MAP30":
@@ -94,7 +94,7 @@ class MapInfoEditor(Frame):
         Frame.__init__(self, parent)
         self.main = main
         if mapinfo is None:
-            self.mapinfo = MapInfo("MAP01",blank=True)
+            self.mapinfo = MapInfo("MAP",blank=True)
         else:
             self.mapinfo = mapinfo
         self.build_view()
@@ -208,8 +208,12 @@ class MainWindow(Tk):
     def build_mapinfoeditor(self,data=None):
         if self.editor is not None:
             self.editor.destroy()
-    
-        self.editor = MapInfoEditor(self.frame,self)
+        
+        if data is None:
+            self.editor = MapInfoEditor(self.frame,self)
+        else:
+            self.editor = MapInfoEditor(self.frame,self,mapinfo=data)
+            
         self.editor.grid(row=0, column=1, rowspan=4, sticky="nesw")
         
     def build_maplist(self):
@@ -223,10 +227,16 @@ class MainWindow(Tk):
         
         for m in self.mapinfolist.maps:
             self.maplist.insert('', len(self.maplist.get_children('')), text=m.mapid)
+            
+        def on_select(event):
+            index = int(self.maplist.selection()[0][1:])-1
+            self.build_mapinfoeditor(self.mapinfolist.maps[index])
+                
+        self.maplist.bind("<<TreeviewSelect>>", on_select)
         
     def del_map(self):
-        parn = self.maplist.item(self.maplist.selection()[0])
-        tkMessageBox.showinfo("delete",str(parn))
+        index = int(self.maplist.selection()[0][1:])-1
+        self.mapinfolist.maps.remove(self.mapinfolist.maps[index])
         self.build_maplist()
         
     def new_map(self):
