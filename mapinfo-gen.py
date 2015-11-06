@@ -261,6 +261,7 @@ class MainWindow(Tk):
         self.mapinfolist.save_map(mapid,data)
         
     def save(self):
+        self.editor.save()
         f = tkFileDialog.asksaveasfilename(defaultextension=".wad")
         if f is None:
             return
