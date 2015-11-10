@@ -321,9 +321,23 @@ class MapInfoList():
             self.maps.append(data)
         
     def read_wad(self,wad):
-        self.maps = []
-        for m in wad.maps:
-            self.maps.append(MapInfo(m,blank=True))
+        if "JMAPINFO" in wad.data:
+            data = json.loads(wad.data["JMAPINFO"].data)
+            self.maps = []
+            for m in data:
+                nm = MapInfo(m['map'],True)
+                nm.partime = int(m['par'])
+                nm.author = m['author']
+                nm.title = m['title']
+                nm.music = m['music']
+                nm.sky = m['sky']
+                nm.titlepatch = m['titlepatch']
+                nm.nextmap = m['nextmap']
+                self.maps.append(nm)
+        else:
+            self.maps = []
+            for m in wad.maps:
+                self.maps.append(MapInfo(m,blank=True))
         
     def to_ZMAPINFO(self):
         output = ''
